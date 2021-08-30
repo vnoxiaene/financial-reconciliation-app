@@ -1,20 +1,22 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { Component } from '@angular/core';
-import { MatchingReport } from './matching-report.model';
+import { Component, OnInit } from '@angular/core';
+import { MatchingReport } from '../matching-report.model';
+import { CompareFilesService } from '../services/compare-files.service';
 
 @Component({
-  selector: 'app-root',
-  templateUrl: './app.component.html',
-  styleUrls: ['./app.component.css']
+  selector: 'app-compare-files',
+  templateUrl: './compare-files.component.html',
+  styleUrls: ['./compare-files.component.css']
 })
-export class AppComponent {
+export class CompareFilesComponent {
+
   selectedFile01 = null;
   selectedFile02 = null;
   matchingReport = new MatchingReport();
   showTable = false;
   showReports = false;
 
-  constructor(private http: HttpClient){}
+  constructor(private service: CompareFilesService){}
 
   selectFile01(event){
     this.selectedFile01 =<File> event.target.files[0];
@@ -31,12 +33,7 @@ export class AppComponent {
     const fd = new FormData();
     fd.append('file01', this.selectedFile01, this.selectedFile01.name);
     fd.append('file02', this.selectedFile02, this.selectedFile02.name);
-    let params = new HttpParams();
-    const options = {
-      params: params,
-      reportProgress: true,
-    };
-    this.http.post('http://localhost:8080/files', fd, options)
+    this.service.compareFiles(fd)
     .subscribe({
       next: (res:MatchingReport) => {
         this.matchingReport.results = res.results;
@@ -49,14 +46,5 @@ export class AppComponent {
     })
       
   }
-  
 
-
-
-
-
- 
-
-
-  
 }
